@@ -1,0 +1,573 @@
+//
+//
+//  Butterfly Tracking System
+//
+//  Created by jay patel on 12/2/15.
+//  Copyright © 2015 While(e_coyote). All rights reserved.
+//
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <iomanip>
+#include <fstream>
+#include <algorithm>
+using namespace std;
+int HEADERNUM = 103;
+
+class ButterflyALL
+{
+private:
+public:
+	struct user
+	{
+		string userType = " ";
+		string id = " ";
+		string firstName = " ";
+		string lastName = " ";
+		string address = " ";
+		string city = " ";
+		string state = " ";
+		string zip = " ";
+		string Organization = " ";
+		int homePhone;
+		int cellPhone;
+	};
+
+	struct BFRepository
+	{
+		string BFid = " ";
+		string watcherID = " ";
+		string event = " ";
+		string tagNum = " ";
+		string specie = " ";
+		string city = " ";
+		string state = " ";
+		string Zip = " ";
+		string country = " ";
+		float    Longitude;
+		float    Latitude;
+		int    year;
+		int    month;
+		int    day;
+		int    hour;
+		int    second;
+		int    minute;
+	};
+
+	int headerRecord;
+	vector<user> userVec;
+	user userinfo;
+	vector<BFRepository> Repository;
+	BFRepository BTrepo;
+	vector<BFRepository> ErrorReport; // this vector is for error data (invalid)
+
+
+	void putITin() // for Testing Need to erase it after ///////
+	{
+		userinfo.id = "jay";
+		userinfo.userType = "T";
+		userVec.push_back(userinfo);
+		userinfo.id = "Patel";
+		userVec.push_back(userinfo);
+		userinfo.id = "Awesome";
+		userVec.push_back(userinfo);
+		BTrepo.event = "T";
+		Repository.push_back(BTrepo);
+
+	}
+
+	bool CheckUserID(string ID)  // Check user ID
+	{
+		putITin();
+		int i = 0;
+		while (i < userVec.size())
+		{
+			if (ID == userVec[i].id)
+				return true;
+			else if (i >= userVec.size()) {
+				cout << "Invalid User ID" << endl;
+				return false;
+			}
+			else
+				i++;
+		}
+		return false;
+	}
+
+	int i;
+	bool CheckTagNum(string tagNum)  // Check user ID
+	{
+		putITin();
+		i = 0;
+		while (i < Repository.size())
+		{
+			if (tagNum == Repository[i].tagNum)
+				return true;
+			else if (i >= Repository.size()) {
+				return false;
+			}
+			else
+				i++;
+		}
+		return false;
+	}
+
+	bool canUserSightBF(string userID, string event)
+	{
+		cout << 3 << endl;
+		if (event == "T" && (userVec[i].userType == "T" || userVec[i].userType == "A" || userVec[i].userType == "G"))
+		{
+			cout << 4 << endl;
+			return true;
+		}
+		else if (event == "S" && (userVec[i].userType == "R" || userVec[i].userType == "T" || userVec[i].userType == "A" || userVec[i].userType == "G"))
+		{
+			cout << 5 << endl;
+			return true;
+		}
+		cout << 6 << endl;
+		return false;
+	}
+
+};
+
+
+class ReportSighting : public ButterflyALL   // inherting from butterflyAll class.
+{
+private:
+public:
+	int getSightingInfo(string UserID)
+		/*
+		name   : getSightingInfo //
+		purpose: get sighting data from keyboard and make sure all the data is correct
+		pre    : User must exit in the system with prevaligies
+		post   : returns a new created node back to the called function.
+		called
+		by      : build(data, path)
+		calls   : none
+		*/
+	{
+		int count = 0;
+		string userChoise = "Y";
+		BTrepo.watcherID = UserID;
+
+
+		// Enter which event it is, Tagging for T or Sighting for S.
+		do{
+			cin.ignore();
+			cout << "Please enter 'T' for tagging event or 'S' for sighting event: "; // Which event it is T or S?
+			getline(cin, BTrepo.event);
+		} while (BTrepo.event != "T" && BTrepo.event != "S");
+		// end event
+
+
+		// checking for user privileges, if event is T then can user tag a butterfly or not
+		cout << 1 << endl;
+		//        if(canUserSightBF(BTrepo.watcherID, BTrepo.event) == false)
+		//        {
+		//            cout << 2 << endl;
+		//            cout << " You do not have privileges to tag a butterfly" << endl; // User do not have privileges
+		//            return 0;
+		//        }
+		// end check for user privileges.
+
+
+		// Enter tag number
+		do{
+			cout << "Please enter a Butterfly tag number: ";        // Enter BF Tag number
+			getline(cin, BTrepo.tagNum);
+			BTrepo.specie.erase(remove_if(BTrepo.specie.begin(), BTrepo.specie.end(), ::isspace), BTrepo.specie.end()); // erase spaces
+		} while ((BTrepo.tagNum.size() <= 0) && (BTrepo.event != "T")); // if user do not enver BT tag number ask again.
+		if (BTrepo.event == "T" && BTrepo.tagNum.size() > 0 && (CheckTagNum(BTrepo.tagNum)) == false) // if T then check privileges
+		{
+			cout << "Your Butterfly tag number is valid" << endl;
+		}
+		else if (BTrepo.event == "S" && BTrepo.tagNum.size() > 0 && (CheckTagNum(BTrepo.tagNum)) == true)// if S then check privileges
+		{
+			cout << "Your Butterfly tag number is valid" << endl;
+		}
+		else
+		{
+			cout << "Your Butterfly tag number is invalid and can not be added" << endl;
+			return 0;
+		}
+		// end tagnumber
+		// Enter Specie
+		cout << "Please enter Specie: "; // Enter Specie
+		getline(cin, BTrepo.specie);
+		BTrepo.specie.erase(remove_if(BTrepo.specie.begin(), BTrepo.specie.end(), ::isspace), BTrepo.specie.end()); // erase spaces
+		// end specie
+		// Enter Location of sighting
+		do{ //
+			if (count > 0){
+				do{
+					cout << "> You enter have entered Invalid data, Would you like to reenter valid data (Y/N): " << endl;
+					cin >> userChoise;
+					if (userChoise != "N")
+						return 0;
+				} while (userChoise != "Y" || userChoise != "N");
+			}
+
+			cout << "Please enter City name: "; // Enter City
+			getline(cin, BTrepo.city);
+			BTrepo.city.erase(remove_if(BTrepo.city.begin(), BTrepo.city.end(), ::isspace), BTrepo.city.end());  // erase spaces
+
+			cout << "Please enter State/Province name: "; // Enter state
+			getline(cin, BTrepo.state);
+			BTrepo.state.erase(remove_if(BTrepo.state.begin(), BTrepo.state.end(), ::isspace), BTrepo.state.end()); // erase spaces
+
+			cout << "Please enter country name: "; // enter country
+			getline(cin, BTrepo.country);
+			BTrepo.country.erase(remove_if(BTrepo.country.begin(), BTrepo.country.end(), ::isspace), BTrepo.country.end());//erase spaces
+
+			cout << "Enter a valid latitude and longitude in a digit form (example: +00.0000000-000.0000000)" << endl; // enter longitude and latatitude
+			cout << "Enter a Latitude (+-00.0000000):"; // enter latitide
+			cin >> BTrepo.Latitude;
+			cout << "Enter a longitude (+-000.0000000):"; // enter longitude
+			cin >> BTrepo.Longitude;
+			count++; // increment count for error
+		} while (((BTrepo.city.size() == 0 || BTrepo.state.size() == 0 || BTrepo.country.size() == 0))
+			&& ((BTrepo.Latitude == 0) && (BTrepo.Longitude == 0))); // check for valid data.
+		// end location
+		// enter date and time
+		if (userChoise == "Y")
+		{
+			cout << "Enter a valid date for the sighting(yyyy/mm/dd)." << endl;
+			do{ // check if user entered valid year
+				cout << "Please enter a valid Year(yyyy) in digits form"; // enter date
+				cin >> BTrepo.year;
+			} while (BTrepo.year < 1000 || BTrepo.year >= 10000); // validate year or reenter.
+			do{ // check if user entered valid month
+				cout << "Please enter month(mm) in digits form"; // enter month
+				cin >> BTrepo.month;
+			} while (BTrepo.month < 00 || BTrepo.month >= 13);
+			do { // check for valid date
+				cout << "Please enter a valid day(dd) in digits form "; // enter a day
+				cin >> BTrepo.day;
+			} while (BTrepo.day <= 0 || BTrepo.day >= 32);
+			cout << "Enter a valid time for the sighting (hh:mm:ss)." << endl;
+			do{
+				cout << "Enter valid hour(24 hour formate):";
+				cin >> BTrepo.hour;
+			} while (BTrepo.hour <= 00 || BTrepo.hour >= 25);
+			do{
+				cout << "Enter minute:";
+				cin >> BTrepo.minute;
+			} while (BTrepo.minute < 00 || BTrepo.minute >= 60);
+			do{
+				cout << "Enter secound:";
+				cin >> BTrepo.second;
+			} while (BTrepo.second < 00 || BTrepo.second >= 60);
+		} // end time/date
+
+		/////// make sure they enter it and then validate it(extrea functionality).
+
+		Repository.push_back(BTrepo); // push in the the vector to save it.
+
+		return 0;
+	}
+};
+
+class FileProcessing : public ButterflyALL
+{
+private:
+	// Temporary variables of characters data type that will hole name of
+	// the city , state, country , species , tag number and watcher ID,
+	// since those Items could have spaces they will be converted into string
+	// after getting the entire line as one string of arrays based on its size
+	char city[29];
+	char state[30];
+	char country[30];
+	char species[20];
+	char tagnum[10];
+	char watcherID[10];
+
+public:
+	/*
+	********************************************************************************************************
+	getFileName	    This function will prompt the user to enter the name of the file he / she wishes to upload
+	and process the data from. the function will check if the input file is correct , if true
+	the file will be processed and continue with the next step if not the user will be
+	asked again to enter a valid file name to be connected to and processed.
+	purpose:		Ask user for name of input file / check if file name exist.
+	Input file ( upload file ) will be opened and continue into the next step.
+	output:			N/A
+	precondition:	valid input file name exist in the same directory for the source upload file.
+	postcondition:	input file ( upload file ) will be opened and ready so data inside will be processed.
+	********************************************************************************************************
+	*/
+	void getFileName(ifstream& myFile){
+		string inFileName; // declare inFileName string data type that will hold name of the file from the user
+		// do loop will make sure input file name is valud / re-prompt the user to enter valid if an invalid name was entered
+		do{
+			inFileName.clear(); // this will make sure after each iteration the string is cleared and set for the next user input
+			cout << "Please enter a valid file name to be connect to and processed : ";
+			cin >> inFileName;
+			myFile.open(inFileName.c_str()); // BEST PART. C++11 stuff "this will convert the end with null byte. make it dynamic memory"
+		} while (!myFile);
+		cout << "Yes was Opened\n";
+	}
+	/*
+	********************************************************************************************************
+	readFile:		This function will process all data inside the specified file to be uploaded into the BTS.
+	purpose:		process data inside the file and store properly.
+	output:			N/A
+	precondition:	Input file already been opened.
+	postcondition:	all data in the uploaded file are stored properly.
+	********************************************************************************************************
+	*/
+	void readFile(ifstream& myFile, ofstream& outPutError){
+
+		char temp; // used to read in temp values between data read in 
+		string tempString; // temporary string to hold data before converting and pushing "used for data manipulation before clearing spaces"
+		bool ErrorKey = false; // error key book value will be set to true when invalid data type are detected in order to output it to the error file
+		int rowNum, rowsCounter = 0; // variables used for counting purp
+ 		string headerString; // string only to hold the header before reading in the data
+		//ErrorReport.resize(1);
+		// int headerNum;
+
+		// if statment in order to check the header (read in first line only)
+		if (!myFile.eof())
+		{
+			myFile >> headerString;
+			cout << headerString << endl;
+			myFile >> HEADERNUM;
+			cout << HEADERNUM << endl;
+			myFile >> headerString;
+			cout << headerString << endl;
+			HEADERNUM = HEADERNUM + 1;
+			cout << HEADERNUM << endl;
+
+		}
+		// read in all file content till end of the file is reached 
+		while (!myFile.eof())
+		{
+			rowsCounter++; // keep track of each line been read in order to compare with the total number of rows by the end 
+			// check for valid event
+			myFile >> BTrepo.event; // read in event then cehck 
+			if (BTrepo.event != "S" || BTrepo.event != "T")
+			{
+				ErrorKey = true; // if event if non of the specified [ S OR T ] set bool key to true in order to output to the error file
+			}
+			else if (BTrepo.event == "TR") // check if last line was reached
+			{
+				myFile >> rowNum;
+				cout << rowNum << endl;
+				if (rowNum != rowsCounter) // output an error if number of line doesnt match the number specified in the last line of rows numbers
+				{
+					cout << "There was an invalid number of rows numbers which did't match the actual number of lines that were processed from the Input file ! " << endl;
+				}
+				outPutError << "DONE!!" << endl;
+				break;
+			}
+			myFile.read(watcherID, sizeof(watcherID));
+			myFile >> BTrepo.year;
+			 if (BTrepo.year < 1000 || BTrepo.year >= 10000)// { ErrorKey = true; }
+			myFile >> temp;
+			myFile >> BTrepo.month;
+			if (BTrepo.month < 00 || BTrepo.month > 12) //{ ErrorKey = true; }
+			myFile >> temp;
+			myFile >> BTrepo.day;
+			if (BTrepo.day <= 0 || BTrepo.day > 31) // { ErrorKey = true; }
+			myFile >> BTrepo.hour;
+			if (BTrepo.hour < 00 || BTrepo.hour >= 24)// { ErrorKey = true; }
+			myFile >> temp;
+			myFile >> BTrepo.minute;
+			if (BTrepo.minute < 00 || BTrepo.minute > 59)// { ErrorKey = true; }
+			myFile >> temp;
+			myFile >> BTrepo.second;
+			if (BTrepo.second < 00 || BTrepo.second >59) //{ ErrorKey = true; }
+			myFile >> BTrepo.Latitude;
+			myFile >> BTrepo.Longitude;
+			myFile.read(city, sizeof(city));
+			myFile.read(state, sizeof(state));
+			myFile.read(country, sizeof(country));
+			myFile.read(species, sizeof(species));
+			myFile >> BTrepo.tagNum;
+			if (BTrepo.event == "T" && BTrepo.tagNum.size() > 0 && (CheckTagNum(BTrepo.tagNum)) == true) // if tag number exist in the repository or not when event is T
+			{
+				//ErrorKey = true;
+			}
+			else if (BTrepo.event == "S" && BTrepo.tagNum.size() > 0 && (CheckTagNum(BTrepo.tagNum)) == false) // if tag number exist in the repository or not when event is S
+			{
+				//ErrorKey = true;
+			}
+			// data manipulations for data read prior , in order to delete the white space in city names and concatinate
+			for (int i = 0; i < 10; i++) 
+			{
+				BTrepo.watcherID = BTrepo.watcherID + watcherID[i];
+			}
+			BTrepo.watcherID.erase(remove_if(BTrepo.watcherID.begin(), BTrepo.watcherID.end(), ::isspace), BTrepo.watcherID.end());//erase spaces
+			if (CheckUserID(BTrepo.watcherID) == false)
+			{
+				//ErrorKey == true;
+			}
+			for (int i = 0; i < 30; i++)
+			{
+				BTrepo.city = BTrepo.city + city[i];
+			}
+			BTrepo.city.erase(remove_if(BTrepo.city.begin(), BTrepo.city.end(), ::isspace), BTrepo.city.end());//erase spaces
+			for (int i = 1; i < 30; i++)
+			{
+				BTrepo.state = BTrepo.state + state[i];
+			}
+			BTrepo.state.erase(remove_if(BTrepo.state.begin(), BTrepo.state.end(), ::isspace), BTrepo.state.end());//erase spaces
+			for (int i = 1; i < 29; i++)
+			{
+				BTrepo.country = BTrepo.country + country[i];
+			}
+			BTrepo.country.erase(remove_if(BTrepo.country.begin(), BTrepo.country.end(), ::isspace), BTrepo.country.end());//erase spaces
+			if (((BTrepo.city.size() == 0 || BTrepo.state.size() == 0 || BTrepo.country.size() == 0))
+				&& ((BTrepo.Latitude == 0) && (BTrepo.Latitude == 0)));
+			{
+				//ErrorKey = true;
+			}
+			for (int i = 1; i < 20; i++)
+			{
+				BTrepo.specie = BTrepo.specie + species[i];
+			}
+			BTrepo.specie.erase(remove_if(BTrepo.specie.begin(), BTrepo.specie.end(), ::isspace), BTrepo.specie.end());//erase spaces
+			if (ErrorKey == true){
+				int x = 0;
+				ErrorReport.push_back(BTrepo);
+			}
+			else {
+				Repository.push_back(BTrepo); // push in the the vector to save it.
+			}
+			ErrorKey = false;
+			// below codes are for debugging !!
+			cout << "\n" << BTrepo.event << " ";
+			cout << BTrepo.watcherID << " ";
+			cout << BTrepo.year << "-";
+			cout << BTrepo.month << "-";
+			cout << BTrepo.day << " ";
+			cout << BTrepo.hour << ":";
+			cout << BTrepo.minute << ":";
+			cout << BTrepo.second << " ";
+			cout << left << " " << BTrepo.Latitude;
+			cout << left << " " << BTrepo.Latitude << endl;
+			cout << BTrepo.city << " " << BTrepo.state << " " << BTrepo.country << " " << BTrepo.specie << " " << BTrepo.tagNum << endl;
+			cout << tempString << endl;
+			// clear all char variables for the next iteration 
+			BTrepo.watcherID.clear();
+			BTrepo.city.clear();
+			BTrepo.state.clear();
+			BTrepo.country.clear();
+			BTrepo.specie.clear();
+		}
+		// this will output the invalid data if found ! then iterate to the next line after "COMMENT ONLY FOR ME :: NEED IOMANIP FORMAT DATA MUST BE THE SAME AS INPUT FILE"
+		for (int i = 0; i < ErrorReport.size(); i++)
+		{
+			outPutError << ErrorReport[i].event << " " << ErrorReport[i].watcherID << " " << ErrorReport[i].year << "-" << ErrorReport[i].month << "-" << ErrorReport[i].day << " " << ErrorReport[i].hour << ":" << ErrorReport[i].minute << ":" << ErrorReport[i].second << " " << ErrorReport[i].city << " " << ErrorReport[i].state << " " << ErrorReport[i].country << " " << ErrorReport[i].specie << " " << ErrorReport[i].tagNum << endl;
+		}
+	}
+};
+
+//1 Sightings.txt
+
+int main()
+{
+	string userChoice, userID, userChoice1;
+	int count = 0;
+	ifstream inFile; // this variable will hold the input file name from user
+	ofstream errorFile; // this variable will hold the output file for error data
+
+	ButterflyALL Repository;
+	ReportSighting AddSighting;
+	FileProcessing processFile;
+	//AddSighting.getSightingInfo(userID);
+
+	cout << "Welcome to While(e_coyote)'s Butterfly Tracking system." << endl;
+	do{
+		cout << "===========================Main Menu===========================" << endl;
+		cout << "Choose an option by entering a number and then pressing enter." << endl;  // main menu
+		cout << "1. Upload a file of Butterfly sighting data." << endl;
+		cout << "2. Report/Tag a Butterfly sighting." << endl;
+		cout << "3. Edit Butterfly sighting." << endl;
+		cout << "4. Search Butterfly sighting data" << endl;
+		cout << "5. Creat new user profile." << endl;
+		cout << "6. Edit user profile." << endl;
+		cout << "7. Download Butterfly data to a file." << endl;
+		cout << "8. Exit the program." << endl;
+		cout << "===========================Main Menu===========================" << endl << endl;
+
+		do {
+			cout << "Please enter a digit from above options: ";
+			cin >> userChoice;
+		} while (userChoice.size() > 1 || userChoice <= "0" || userChoice >= "8");
+		cout << endl;
+		// JAY & RAFI SUPERVISION IS WORKING HERE ... high speed stuff open file then process data  
+		if (userChoice == "1") // if user enter 1 from main menu
+		{
+			processFile.getFileName(inFile); // call get file name function which will get the name of the file from the user.
+			processFile.readFile(inFile, errorFile);    // call read file function in order to process all data inside.
+
+		}
+		else if (userChoice == "2")
+		{
+			do{
+				cout << "Please enter your valid userID: "; // Enter Watcher ID
+				cin >> userID;
+				userID.erase(remove_if(userID.begin(), userID.end(), ::isspace), userID.end()); //erase spaces
+				count++;
+				if (count >= 5){
+					cout << "> Wrong user ID was entered too many times." << endl << endl;
+					break;
+				}
+			} while ((Repository.CheckUserID(userID)) != true);
+			if (count<6)
+				AddSighting.getSightingInfo(userID);
+			cout << endl;
+		}
+		if (userChoice == "3")
+		{
+			do{
+				cout << "========================= Seach Menu ==========================" << endl;
+				cout << "1. Search only tagged Butterfly data." << endl;
+				cout << "2. Search only untagged Butterfly data." << endl;
+				cout << "3. Search both tagged and untagged Butterfly data." << endl;
+				cout << "4. Migration route for tagged Butterfly." << endl;
+				cout << "5. Speed of a tagged Butterfly." << endl;
+				cout << "6. Calculate variation in sighting inbetween two dates." << endl;
+				cout << "7. Check ." << endl;
+				cout << "8. Exit to main menu." << endl;
+				cout << "========================= Seach Menu ==========================" << endl << endl;
+				do{
+					cout << "Please enter a digit from above options: ";
+					cin >> userChoice;
+				} while (userChoice.size() > 1 || userChoice <= "0" || userChoice >= "9");
+
+				if (userChoice == "1")
+					cout << "Call Search" << endl;
+				else if (userChoice == "2")
+					cout << "Call Search" << endl;
+				else if (userChoice == "3")
+					cout << "Call Search" << endl;
+				else if (userChoice == "4")
+					cout << "Display migration route" << endl;
+				else if (userChoice == "5")
+					cout << "Display Speed of BF" << endl;
+				else if (userChoice == "6")
+					cout << "Display Variation in num of BF" << endl;
+				else if (userChoice == "7")
+					cout << "Display life span of BF" << endl;
+				else if (userChoice == "8")
+					cout << ">Exit back to main menu. " << endl;
+
+			} while (userChoice != "8");
+		}
+		else if (userChoice == "3")
+			cout << "Search BF data " << endl;
+		else if (userChoice == "4")
+			cout << "Create new user" << endl;
+		else if (userChoice == "5")
+			cout << "edit user" << endl;
+		else if (userChoice == "6")
+			cout << "download BF Data" << endl;
+		else if (userChoice == "7")
+			cout << "back up and Exit the program." << endl;
+
+	} while (userChoice != "7");
+	return 0;
+}
