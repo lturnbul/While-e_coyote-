@@ -1,0 +1,59 @@
+// stable_sort example
+#include <iostream>     // std::cout
+#include <algorithm>    // std::stable_sort
+#include <vector>       // std::vector
+#include <string>
+#include <sstream>
+using namespace std;
+
+struct BF
+{
+	int ID = 1234;
+	int Longi = 12.1234;
+	int Lati = 57.1234;
+	int DateInt = 0;
+};
+//bool compare_as_ints(double i, double j) //
+//{
+//	return (int(i)<int(j));
+//}
+//struct Sorter used to sort the struct by date
+struct Sorter {
+	bool operator ()(const BF &o1, const BF &o2) {
+		return o1.DateInt < o2.DateInt;
+	}
+};
+int main()
+{
+
+	vector <BF> nDate(10); //declaring vector to store integer dates
+	//declaring a vector of strings for string dates
+	vector<string> date = { "2020/09/08", "2011-08-12", "1980-08-12", "1999-08-12", "2015-01-01", "2012-12-12", "2002-05-11", "2004-05-18", "1943-01 12", "2000 12 12" };
+	cout << "String date original then string date truncated" << endl;
+	for (int i = 0; i < 10; i++)			//for loop to take out char between YYYY&MM and bet MM&DD
+	{
+		cout << date[i] << endl;			//print original string
+		date[i].erase(4, 1);				//erase char between YYYY & MM
+		//cout << date[i] << endl;			//print out 
+		date[i].erase(6, 1);				//erase char between MM & DD
+		cout << date[i] << endl;			//print out
+		stringstream(date[i]) >> nDate[i].DateInt;	//convert string date to an integer
+		//cout << nDate[i] << endl;			//print integer
+	}
+	cout << "Integer dates unsorted: " << endl;
+	for (int i = 0; i < 10; i++)//printing out the dates now stored unsorted as integers
+	{
+		cout << nDate[i].DateInt << endl;
+	}
+	cout << "using 'struct Sorter' :";
+	stable_sort(nDate.begin(), nDate.end(), Sorter());//sorting integer date vector ascending
+	cout << "Integer dates sorted: " << endl;
+	for (int i = 0; i < nDate.size(); i++) //printing sorted vector
+		cout << ' ' << nDate[i].DateInt << endl;
+	cout << '\n';
+
+
+	system("pause");
+	return 0;
+}
+//Edit & Run
